@@ -4,7 +4,7 @@ module Cucumber
   #
   # @author zedtux
   #
-  module Instafail
+  class Instafail < Cucumber::Formatter::Progress
     VERSION = '0.1.0'
   end
 end
