@@ -8,7 +8,10 @@ module Cucumber
       def progress(status)
         char = CHARS[status]
         @io.print(format_string(char, status))
-        print_steps(:failed) if status == :failed
+        if status == :failed
+          last_failed = runtime.steps(:failed).last
+          print_elements(Array(last_failed), status, 'steps')
+        end
         @io.flush
       end
     end

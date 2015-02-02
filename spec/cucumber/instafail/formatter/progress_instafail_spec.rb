@@ -157,6 +157,16 @@ module Cucumber
           it 'should have 3 scenarios, 2 failures and 1 passed' do
             expect(@out.string).to include '3 scenarios (2 failed, 1 passed)'
           end
+
+          it 'should not display duplicates' do
+            header = "F(::) failed steps (::)\n\n"
+
+            expected = "#{header}The Gorilla is unhappy : ( (RuntimeError)"
+            expect(@out.string).to include expected
+
+            expected = "#{header}The Lion is unhappy too (RuntimeError)"
+            expect(@out.string).to include expected
+          end
         end
       end
     end
