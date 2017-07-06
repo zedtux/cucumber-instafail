@@ -1,4 +1,4 @@
-# Cucumber::Instafail
+# Cucumber::Instafail [![Build Status](https://travis-ci.org/zedtux/cucumber-instafail.svg?branch=master)](https://travis-ci.org/zedtux/cucumber-instafail)
 
 Show failing features instantly. Show passing spec as green dots as usual.
 Highly inspired from
