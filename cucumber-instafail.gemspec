@@ -1,9 +1,9 @@
 # coding: utf-8
-require './lib/cucumber/instafail/version'
+require './lib/cucumber/version'
 
 Gem::Specification.new do |spec|
   spec.name          = 'cucumber-instafail'
-  spec.version       = Cucumber::Instafail::VERSION
+  spec.version       = Cucumber::Version::INSTA_FAIL_VERSION
   spec.authors       = ['Guillaume Hain']
   spec.email         = ['zedtux@zedroot.org']
   spec.summary       = 'Show failing features instantly'

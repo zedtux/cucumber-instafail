@@ -1,5 +1,5 @@
 require 'cucumber/formatter/progress'
-require 'cucumber/instafail/version'
+require 'cucumber/version'
 
 module Cucumber
   # The formatter used for <tt>--format Cucumber::Instafail</tt>
