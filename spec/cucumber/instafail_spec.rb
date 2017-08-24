@@ -13,7 +13,7 @@ module Cucumber
       Cucumber::Term::ANSIColor.coloring = false
       @out = StringIO.new
       @options = Cucumber::Cli::Options.new
-      @formatter = Instafail.new(step_mother, @out, @options)
+      @formatter = Instafail.new(runtime, @out, @options)
       run_defined_feature
     end
 
