@@ -35,7 +35,7 @@ module Cucumber
     require 'cucumber/formatter/legacy_api/adapter'
     def report
       @report ||= Cucumber::Formatter::LegacyApi::Adapter.new(
-        Fanout.new([@formatter]),
+        Cucumber::Formatter::Fanout.new([@formatter]),
         runtime.results,
         runtime.support_code,
         runtime.configuration)
