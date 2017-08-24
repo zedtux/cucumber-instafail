@@ -19,18 +19,26 @@ module Cucumber
     def run_defined_feature
       define_steps
       runtime.visitor = report
-      execute [gherkin_doc], mappings, report
-      report.after_suite # TODO: move into core
+
+      receiver = Test::Runner.new(report)
+      filters = [
+        Filters::ActivateSteps.new(runtime.support_code),
+        Filters::ApplyAfterStepHooks.new(runtime.support_code),
+        Filters::ApplyBeforeHooks.new(runtime.support_code),
+        Filters::ApplyAfterHooks.new(runtime.support_code),
+        Filters::ApplyAroundHooks.new(runtime.support_code),
+        Filters::PrepareWorld.new(runtime)
+      ]
+      compile [gherkin_doc], receiver, filters
     end
 
-    require 'cucumber/mappings'
-    def mappings
-      @mappings ||= Mappings.new
-    end
-
-    require 'cucumber/formatter/report_adapter'
+    require 'cucumber/formatter/legacy_api/adapter'
     def report
-      @report ||= Cucumber::Formatter::ReportAdapter.new runtime, [@formatter]
+      @report ||= LegacyApi::Adapter.new(
+        Fanout.new([@formatter]),
+        runtime.results,
+        runtime.support_code,
+        runtime.configuration)
     end
 
     require 'cucumber/core/gherkin/document'
@@ -43,7 +51,7 @@ module Cucumber
     end
 
     def runtime
-      mappings.runtime
+      @runtime ||= Runtime.new
     end
 
     def define_steps
