@@ -12,37 +12,51 @@ module Cucumber
     end
   end
 
+  require 'cucumber/core'
   module SpecHelper
+    include Core
+
     def run_defined_feature
       define_steps
-      features = load_features(self.class.feature_content ||
-                               raise('No feature content defined!'))
-      run(features)
+      runtime.visitor = report
+
+      receiver = Test::Runner.new(report)
+      filters = [
+        Filters::ActivateSteps.new(runtime.support_code),
+        Filters::ApplyAfterStepHooks.new(runtime.support_code),
+        Filters::ApplyBeforeHooks.new(runtime.support_code),
+        Filters::ApplyAfterHooks.new(runtime.support_code),
+        Filters::ApplyAroundHooks.new(runtime.support_code),
+        Filters::PrepareWorld.new(runtime)
+      ]
+      compile [gherkin_doc], receiver, filters
     end
 
-    def step_mother
-      @step_mother ||= Runtime.new
+    require 'cucumber/formatter/legacy_api/adapter'
+    def report
+      @report ||= Cucumber::Formatter::LegacyApi::Adapter.new(
+        Cucumber::Formatter::Fanout.new([@formatter]),
+        runtime.results,
+        runtime.support_code,
+        runtime.configuration)
     end
 
-    def load_features(content)
-      feature_file = FeatureFile.new(self.class.feature_filename, content)
-      features = Ast::Features.new
-      filters = []
-      feature = feature_file.parse(filters, {})
-      features.add_feature(feature) if feature
-      features
+    require 'cucumber/core/gherkin/document'
+    def gherkin_doc
+      Core::Gherkin::Document.new(self.class.feature_filename, gherkin)
     end
 
-    def run(features)
-      configuration = Cucumber::Configuration.default
-      tree_walker = Cucumber::Ast::TreeWalker.new(step_mother, [@formatter],
-                                                  configuration)
-      tree_walker.visit_features(features)
+    def gherkin
+      self.class.feature_content || raise("No feature content defined!")
+    end
+
+    def runtime
+      @runtime ||= Runtime.new
     end
 
     def define_steps
       return unless step_defs = self.class.step_defs
-      rb = step_mother.load_programming_language('rb')
+      rb = runtime.load_programming_language('rb')
       dsl = Object.new
       dsl.extend RbSupport::RbDsl
       dsl.instance_exec &step_defs
